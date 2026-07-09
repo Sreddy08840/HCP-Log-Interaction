@@ -103,10 +103,16 @@ Ensure you have **Python 3.10+** and **Node.js 18+** installed.
    ```env
    GROQ_API_KEY=your_groq_api_key_here
    ```
-5. Start the FastAPI server:
+5. Start the FastAPI server (since you are inside the `backend` directory):
    ```bash
-   python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
+   # If venv is activated:
+   uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+   
+   # Or using Windows Python launcher:
+   py -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
    ```
+
+   *Note: If you run uvicorn from the root workspace directory instead, use `backend.app.main:app` as the app path.*
 
 ### 2. Run the Frontend
 1. Open another terminal and navigate to the frontend directory:
