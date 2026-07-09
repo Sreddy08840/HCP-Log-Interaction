@@ -74,6 +74,45 @@ export const sendChatMessage = createAsyncThunk(
   }
 );
 
+const checkDraftCompliance = (pending, hcps, samples) => {
+  if (!pending) return null;
+  
+  const hcpId = pending.hcp_id;
+  const hcp = hcps.find(h => h.id === Number(hcpId));
+  if (!hcp) {
+    return "HCP not found in database.";
+  }
+  
+  if (!hcp.npi_id || hcp.npi_id.length < 10) {
+    return `HCP NPI ID ${hcp.npi_id || ''} is invalid or suspended.`;
+  }
+  
+  if (pending.samples_dropped) {
+    for (const sDrop of pending.samples_dropped) {
+      const qty = sDrop.qty;
+      if (qty <= 0) {
+        return "Sample quantity must be greater than zero.";
+      }
+      if (qty > 10) {
+        return `Non-compliant: Quantity of ${qty} exceeds the single-transaction limit of 10 samples.`;
+      }
+      
+      const sample = samples.find(s => s.id === Number(sDrop.sample_id));
+      if (sample) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const expiry = new Date(sample.expiry_date);
+        expiry.setHours(0, 0, 0, 0);
+        if (expiry < today) {
+          return `Non-compliant: Lot '${sample.lot_number}' expired on ${sample.expiry_date} and cannot be distributed.`;
+        }
+      }
+    }
+  }
+  
+  return null;
+};
+
 const initialFormState = {
   hcp_id: '',
   channel: 'visit',
@@ -146,6 +185,14 @@ const interactionSlice = createSlice({
       if (state.chat.pendingExtraction) {
         const { field, value } = action.payload;
         state.chat.pendingExtraction[field] = value;
+        
+        // Re-check compliance dynamically
+        const warning = checkDraftCompliance(
+          state.chat.pendingExtraction,
+          state.hcps,
+          state.samples
+        );
+        state.chat.warning = warning;
       }
     },
     clearPendingExtraction: (state) => {

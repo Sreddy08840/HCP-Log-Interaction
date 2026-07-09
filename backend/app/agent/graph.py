@@ -152,13 +152,20 @@ def parse_with_rules(text: str, active_hcp_id: Optional[int], db: Session) -> Di
     # 7. Discussion Topics
     topics = []
     if products_discussed:
-        topics = [f"Product Discussion: {p}" for p in products_discussed]
-    else:
-        topics = ["General check-in"]
-    if "efficacy" in text_lower:
-        topics.append("Efficacy and safety details")
-    if "sample" in text_lower or "drop" in text_lower:
+        topics.append("Product Presentation")
+    if "efficacy" in text_lower or "review" in text_lower:
+        topics.append("Efficacy Review")
+    if "safety" in text_lower or "side effect" in text_lower:
+        topics.append("Safety Profile")
+    if "dosage" in text_lower or "dose" in text_lower:
+        topics.append("Dosage Options")
+    if "competitor" in text_lower or "compete" in text_lower:
+        topics.append("Competitor Comparison")
+    if "sample" in text_lower or "drop" in text_lower or "distribut" in text_lower:
         topics.append("Sample distribution")
+        
+    if not topics:
+        topics = ["Product Presentation"]
 
     # 8. Summary
     summary_text = f"Met with {hcp_name or 'HCP'} via {channel}. Discussed "
@@ -381,7 +388,7 @@ def execute_agent_step(state: AgentState, db: Session) -> AgentState:
                 - channel: 'visit', 'call', 'virtual', 'email' (default 'visit').
                 - duration_minutes: int (default 15).
                 - sentiment: 'positive', 'neutral', 'negative', 'objection' (default 'positive').
-                - discussion_topics: list of strings.
+                - discussion_topics: list of strings. Select only from these standard topics: 'Product Presentation', 'Efficacy Review', 'Safety Profile', 'Dosage Options', 'Competitor Comparison', 'Sample distribution'.
                 - products_discussed: list of strings (names of products).
                 - samples_dropped: list of objects with fields: product_id, sample_id, lot_number, product_name, qty.
                 - follow_up_date: YYYY-MM-DD string. Calculate based on text (default 14 days from today: {datetime.date.today() + datetime.timedelta(days=14)}).

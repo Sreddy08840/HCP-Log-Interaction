@@ -1041,3 +1041,52 @@ body {
   0% { transform: translateY(-20px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
+
+/* Custom styles for draft card checkboxes and warnings */
+.draft-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: hsla(220, 30%, 8%, 0.4);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  width: 100%;
+}
+
+.draft-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+  background: hsla(217, 30%, 20%, 0.4);
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.draft-checkbox-label input {
+  cursor: pointer;
+}
+
+.draft-checkbox-label:hover {
+  background: hsla(217, 30%, 20%, 0.8);
+  border-color: var(--panel-border);
+}
+
+.draft-warning-banner {
+  background: var(--danger-bg);
+  color: hsl(0, 72%, 75%);
+  border: 1px solid var(--danger-border);
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-top: 10px;
+  line-height: 1.4;
+  width: 100%;
+}
+
+.align-start { align-items: flex-start; }

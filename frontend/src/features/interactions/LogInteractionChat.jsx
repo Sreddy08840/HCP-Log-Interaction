@@ -8,6 +8,15 @@ import {
   fetchAuditLogs
 } from './interactionSlice';
 
+const STANDARD_TOPICS = [
+  'Product Presentation',
+  'Efficacy Review',
+  'Safety Profile',
+  'Dosage Options',
+  'Competitor Comparison',
+  'Sample distribution'
+];
+
 const LogInteractionChat = () => {
   const dispatch = useDispatch();
   const { chat, products, samples, submitSuccess } = useSelector((state) => state.interaction);
@@ -144,10 +153,58 @@ const LogInteractionChat = () => {
                 </div>
               </div>
 
+
+
               {/* Discussion Products */}
-              <div className="draft-field">
-                <span className="draft-label">Products Discussed:</span>
-                <span className="draft-value">{chat.pendingExtraction.products_discussed?.join(', ') || 'None'}</span>
+              <div className="draft-field flex-column mt-5 align-start w-full">
+                <span className="draft-label block mb-5">Products Discussed:</span>
+                <div className="draft-checkbox-group">
+                  {products.map((p) => {
+                    const isChecked = chat.pendingExtraction.products_discussed?.includes(p.name);
+                    return (
+                      <label key={p.id} className="draft-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={isChecked || false}
+                          onChange={(e) => {
+                            const current = chat.pendingExtraction.products_discussed || [];
+                            const updated = e.target.checked
+                              ? [...current, p.name]
+                              : current.filter(name => name !== p.name);
+                            handleDraftFieldChange('products_discussed', updated);
+                          }}
+                        />
+                        <span>{p.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Discussion Topics */}
+              <div className="draft-field flex-column mt-5 align-start w-full">
+                <span className="draft-label block mb-5">Discussion Topics:</span>
+                <div className="draft-checkbox-group">
+                  {STANDARD_TOPICS.map((topic) => {
+                    const isChecked = chat.pendingExtraction.discussion_topics?.includes(topic);
+                    return (
+                      <label key={topic} className="draft-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={isChecked || false}
+                          onChange={(e) => {
+                            const current = chat.pendingExtraction.discussion_topics || [];
+                            const updated = e.target.checked
+                              ? [...current, topic]
+                              : current.filter(t => t !== topic);
+                            handleDraftFieldChange('discussion_topics', updated);
+                          }}
+                        />
+                        <span>{topic}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Samples */}
@@ -171,7 +228,7 @@ const LogInteractionChat = () => {
                             type="number"
                             value={sample.qty}
                             min="1"
-                            max="12"
+                            max="10"
                             onChange={(e) => handleDraftSampleQty(idx, e.target.value)}
                             className="draft-input-text w-50"
                           />
@@ -188,7 +245,7 @@ const LogInteractionChat = () => {
               </div>
 
               {/* Next Best Action */}
-              <div className="draft-field flex-column mt-5">
+              <div className="draft-field flex-column mt-5 align-start w-full">
                 <span className="draft-label block">Next Best Action:</span>
                 <input
                   type="text"
@@ -210,7 +267,7 @@ const LogInteractionChat = () => {
               </div>
 
               {/* Summary Notes */}
-              <div className="draft-field flex-column mt-5">
+              <div className="draft-field flex-column mt-5 align-start w-full">
                 <span className="draft-label block">Summary:</span>
                 <textarea
                   rows="2"
@@ -219,13 +276,24 @@ const LogInteractionChat = () => {
                   className="draft-textarea w-full mt-2"
                 ></textarea>
               </div>
+
+              {/* Local Warning Banner inside Card */}
+              {chat.warning && (
+                <div className="draft-warning-banner">
+                  ⚠️ {chat.warning}
+                </div>
+              )}
             </div>
 
             <div className="draft-card-footer flex-row gap-10 justify-end">
               <button onClick={handleCancelDraft} className="btn btn-secondary btn-sm">
                 Cancel
               </button>
-              <button onClick={handleConfirmDraft} className="btn btn-primary btn-sm">
+              <button 
+                onClick={handleConfirmDraft} 
+                className="btn btn-primary btn-sm"
+                disabled={!!chat.warning}
+              >
                 Confirm & Save
               </button>
             </div>
