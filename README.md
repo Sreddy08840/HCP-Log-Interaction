@@ -122,3 +122,9 @@ Ensure you have **Python 3.10+** and **Node.js 18+** installed.
    npm run dev
    ```
 4. Open your browser and navigate to `http://localhost:5173/`.
+
+---
+
+## Contributors
+
+* **Sreddy08840** — [GitHub Profile](https://github.com/Sreddy08840/)
