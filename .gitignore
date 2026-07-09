@@ -1,0 +1,20 @@
+# Environments
+.env
+backend/.env
+venv/
+backend/venv/
+
+# Python Cache
+__pycache__/
+backend/app/__pycache__/
+*.pyc
+
+# Local databases
+*.db
+crm.db
+
+# Frontend dependency & build
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
