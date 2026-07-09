@@ -207,6 +207,18 @@ def apply_chat_edit(pending: Dict[str, Any], text: str, db: Session) -> Dict[str
             if s in text_lower:
                 updated["sentiment"] = s
                 
+    # Edit HCP (doctor)
+    # E.g. "change doctor to Mehta" or "change hcp to Sharma" or "doctor Verma"
+    if "doctor" in text_lower or "hcp" in text_lower or "dr" in text_lower:
+        name_match = re.search(r'(?:doctor|hcp|dr\.?|change to)\s+([a-zA-Z\s]+)', text_lower)
+        if name_match:
+            search_name = name_match.group(1).strip()
+            from backend.app.models import HCP
+            hcp = db.query(HCP).filter(HCP.name.like(f"%{search_name}%")).first()
+            if hcp:
+                updated["hcp_id"] = hcp.id
+                updated["hcp_name"] = hcp.name
+                
     # Edit quantity
     # E.g. "change quantity to 5" or "quantity 8"
     qty_match = re.search(r'(?:quantity|qty|units|amount|change to)\s*(?:to\s*)?(\d+)', text_lower)
@@ -235,7 +247,7 @@ def apply_chat_edit(pending: Dict[str, Any], text: str, db: Session) -> Dict[str
         updated["follow_up_date"] = new_date.isoformat()
         
     # Edit duration
-    dur_match = re.search(r'(?:duration|time|minutes|min)\s*(?:to\s*)?(\d+)', text_lower)
+    dur_match = re.search(r'(?:duration|time|timing|minutes|min)\s*(?:to\s*)?(\d+)', text_lower)
     if dur_match:
         updated["duration_minutes"] = int(dur_match.group(1))
         

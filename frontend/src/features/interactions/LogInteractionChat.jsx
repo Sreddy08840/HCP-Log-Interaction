@@ -19,7 +19,7 @@ const STANDARD_TOPICS = [
 
 const LogInteractionChat = () => {
   const dispatch = useDispatch();
-  const { chat, products, samples, submitSuccess } = useSelector((state) => state.interaction);
+  const { chat, products, samples, hcps, submitSuccess } = useSelector((state) => state.interaction);
   const [input, setInput] = useState('');
   const chatEndRef = useRef(null);
 
@@ -106,7 +106,24 @@ const LogInteractionChat = () => {
               {/* HCP */}
               <div className="draft-field">
                 <span className="draft-label">HCP Name:</span>
-                <span className="draft-value font-bold">{chat.pendingExtraction.hcp_name || 'Unresolved HCP'}</span>
+                <select
+                  value={chat.pendingExtraction.hcp_id}
+                  onChange={(e) => {
+                    const selectedId = Number(e.target.value);
+                    const selectedHcp = hcps.find(h => h.id === selectedId);
+                    if (selectedHcp) {
+                      handleDraftFieldChange('hcp_id', selectedId);
+                      handleDraftFieldChange('hcp_name', selectedHcp.name);
+                    }
+                  }}
+                  className="draft-input-select"
+                >
+                  {hcps.map((hcp) => (
+                    <option key={hcp.id} value={hcp.id}>
+                      {hcp.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Channel */}
